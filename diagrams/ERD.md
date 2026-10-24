@@ -1,5 +1,70 @@
 # ERD – Quản lý Bán hàng
 
+```mermaid
+erDiagram
+    DanhMuc {
+        int maDanhMuc PK
+        varchar tenDanhMuc
+        text moTa
+    }
+    NhaCungCap {
+        int maNCC PK
+        varchar tenNCC
+        varchar diaChi
+        varchar soDienThoai
+        varchar email
+    }
+    SanPham {
+        int maSanPham PK
+        varchar tenSanPham
+        int maDanhMuc FK
+        int maNCC FK
+        decimal giaBan
+        int soLuongTon
+        varchar donVi
+    }
+    KhachHang {
+        int maKH PK
+        varchar hoTen
+        varchar soDienThoai
+        varchar email
+        varchar diaChi
+        date ngayDangKy
+    }
+    NhanVien {
+        int maNV PK
+        varchar hoTen
+        varchar chucVu
+        varchar soDienThoai
+        varchar email
+        varchar matKhau
+        date ngayVaoLam
+    }
+    HoaDon {
+        int maHD PK
+        int maKH FK
+        int maNV FK
+        datetime ngayLap
+        enum trangThai
+        text ghiChu
+    }
+    ChiTietHoaDon {
+        int maHD FK
+        int maSanPham FK
+        int soLuong
+        decimal donGia
+        decimal giamGia
+    }
+
+    DanhMuc    ||--o{ SanPham        : "phân loại"
+    NhaCungCap ||--o{ SanPham        : "cung cấp"
+    KhachHang  ||--o{ HoaDon         : "đặt hàng"
+    NhanVien   ||--o{ HoaDon         : "lập"
+    HoaDon     ||--o{ ChiTietHoaDon  : "gồm"
+    SanPham    ||--o{ ChiTietHoaDon  : "có trong"
+```
+
+
 ## Các thực thể và thuộc tính
 
 ### DanhMuc
