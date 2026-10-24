@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Nhân viên{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="page-title mb-0"><i class="bi bi-person-badge me-2"></i>Nhân viên</h4>
+  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalThem">
+    <i class="bi bi-plus-lg me-1"></i>Thêm mới
+  </button>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr><th>ID</th><th>Họ tên</th><th>Chức vụ</th><th>Số điện thoại</th><th>Email</th><th>Ngày vào làm</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+        <tr>
+          <td>{{ r.maNV }}</td>
+          <td class="fw-semibold">{{ r.hoTen }}</td>
+          <td>
+            {% if r.chucVu == 'Quản lý' %}
+              <span class="badge bg-danger">{{ r.chucVu }}</span>
+            {% elif r.chucVu == 'Kế toán' %}
+              <span class="badge bg-warning text-dark">{{ r.chucVu }}</span>
+            {% else %}
+              <span class="badge bg-secondary">{{ r.chucVu }}</span>
+            {% endif %}
+          </td>
+          <td>{{ r.soDienThoai }}</td>
+          <td>{{ r.email or '—' }}</td>
+          <td>{{ r.ngayVaoLam }}</td>
+          <td class="text-nowrap">
+            <button class="btn btn-sm btn-outline-primary"
+              data-bs-toggle="modal" data-bs-target="#modalSua{{ r.maNV }}">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-warning"
+              data-bs-toggle="modal" data-bs-target="#modalMK{{ r.maNV }}"
+              title="Đổi mật khẩu">
+              <i class="bi bi-key"></i>
+            </button>
+            <a href="{{ url_for('xoa_nv', id=r.maNV) }}"
+               class="btn btn-sm btn-outline-danger"
+               onclick="return confirm('Xóa nhân viên này?')">
+              <i class="bi bi-trash"></i>
+            </a>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-center text-muted py-4">Không có dữ liệu</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal Thêm -->
+<div class="modal fade" id="modalThem" tabindex="-1">
+  <div class="modal-dialog">
+    <form method="post" action="{{ url_for('them_nv') }}" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Thêm nhân viên</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3"><label class="form-label">Họ tên *</label>
+          <input name="hoTen" class="form-control" required></div>
+        <div class="mb-3"><label class="form-label">Chức vụ</label>
+          <select name="chucVu" class="form-select">
+            <option>Nhân viên</option><option>Quản lý</option><option>Kế toán</option>
+          </select></div>
+        <div class="mb-3"><label class="form-label">Số điện thoại *</label>
+          <input name="soDienThoai" class="form-control" required></div>
+        <div class="mb-3"><label class="form-label">Mật khẩu *</label>
+          <input name="matKhau" type="password" class="form-control" required
+                 placeholder="Nhập mật khẩu đăng nhập"></div>
+        <div class="mb-3"><label class="form-label">Email</label>
+          <input name="email" type="email" class="form-control"></div>
+        <div class="mb-3"><label class="form-label">Ngày vào làm *</label>
+          <input name="ngayVaoLam" type="date" class="form-control" required></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="submit" class="btn btn-primary">Lưu</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Sửa -->
+{% for r in rows %}
+<div class="modal fade" id="modalSua{{ r.maNV }}" tabindex="-1">
+  <div class="modal-dialog">
+    <form method="post" action="{{ url_for('sua_nv', id=r.maNV) }}" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Sửa nhân viên #{{ r.maNV }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3"><label class="form-label">Họ tên *</label>
+          <input name="hoTen" class="form-control" value="{{ r.hoTen }}" required></div>
+        <div class="mb-3"><label class="form-label">Chức vụ</label>
+          <select name="chucVu" class="form-select">
+            {% for cv in ['Nhân viên','Quản lý','Kế toán'] %}
+            <option {% if cv==r.chucVu %}selected{% endif %}>{{ cv }}</option>
+            {% endfor %}
+          </select></div>
+        <div class="mb-3"><label class="form-label">Số điện thoại *</label>
+          <input name="soDienThoai" class="form-control" value="{{ r.soDienThoai }}" required></div>
+        <div class="mb-3"><label class="form-label">Email</label>
+          <input name="email" type="email" class="form-control" value="{{ r.email or '' }}"></div>
+        <div class="mb-3"><label class="form-label">Ngày vào làm *</label>
+          <input name="ngayVaoLam" type="date" class="form-control" value="{{ r.ngayVaoLam }}" required></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="submit" class="btn btn-primary">Cập nhật</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endfor %}
+{% endblock %}

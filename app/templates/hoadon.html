@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Hóa đơn{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="page-title mb-0"><i class="bi bi-receipt me-2"></i>Hóa đơn</h4>
+  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTaoHD">
+    <i class="bi bi-plus-lg me-1"></i>Tạo hóa đơn mới
+  </button>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr><th>Mã HD</th><th>Khách hàng</th><th>Nhân viên</th><th>Ngày lập</th>
+            <th class="text-end">Tổng tiền</th><th>Trạng thái</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+        {% set badge = {
+          'Hoàn thành': 'bg-success',
+          'Đang giao':  'bg-primary',
+          'Chờ xử lý':  'bg-warning text-dark',
+          'Đã hủy':     'bg-danger'
+        } %}
+        <tr>
+          <td>#{{ r.maHD }}</td>
+          <td class="fw-semibold">{{ r.tenKH }}</td>
+          <td>{{ r.tenNV }}</td>
+          <td>{{ r.ngayLap.strftime('%d/%m/%Y %H:%M') if r.ngayLap else '—' }}</td>
+          <td class="text-end">{{ "{:,.0f}".format(r.tongTien) }} đ</td>
+          <td><span class="badge {{ badge.get(r.trangThai, 'bg-secondary') }}">{{ r.trangThai }}</span></td>
+          <td>
+            <a href="{{ url_for('chi_tiet_hd', id=r.maHD) }}" class="btn btn-sm btn-outline-secondary">
+              <i class="bi bi-eye"></i>
+            </a>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-center text-muted py-4">Không có dữ liệu</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal Tạo hóa đơn mới -->
+<div class="modal fade" id="modalTaoHD" tabindex="-1">
+  <div class="modal-dialog">
+    <form method="post" action="{{ url_for('tao_hd') }}" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Tạo hóa đơn mới</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Khách hàng *</label>
+          <select name="maKH" class="form-select" required>
+            <option value="">-- Chọn khách hàng --</option>
+            {% for kh in khachhangs %}
+            <option value="{{ kh.maKH }}">{{ kh.hoTen }} – {{ kh.soDienThoai }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Ghi chú</label>
+          <input name="ghiChu" class="form-control" placeholder="Ghi chú (tùy chọn)">
+        </div>
+        <div class="text-muted small"><i class="bi bi-info-circle me-1"></i>
+          Nhân viên lập: <strong>{{ session.nv_ten }}</strong>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="submit" class="btn btn-primary">Tạo hóa đơn</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

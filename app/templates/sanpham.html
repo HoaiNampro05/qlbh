@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}Sản phẩm{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="fw-bold mb-0"><i class="bi bi-box-seam me-2"></i>Sản phẩm</h4>
+  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalThem">
+    <i class="bi bi-plus-lg me-1"></i>Thêm mới
+  </button>
+</div>
+
+<form class="mb-3 d-flex gap-2" method="get">
+  <input name="q" class="form-control" placeholder="Tìm theo tên sản phẩm..." value="{{ kw }}">
+  <button class="btn btn-outline-secondary">Tìm</button>
+  {% if kw %}<a href="{{ url_for('sanpham') }}" class="btn btn-outline-danger">Xóa lọc</a>{% endif %}
+</form>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr><th>ID</th><th>Tên sản phẩm</th><th>Danh mục</th><th>Nhà CC</th>
+            <th>Giá bán</th><th>Tồn kho</th><th>Đơn vị</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+        <tr>
+          <td>{{ r.maSanPham }}</td>
+          <td class="fw-semibold">{{ r.tenSanPham }}</td>
+          <td>{{ r.tenDanhMuc }}</td>
+          <td>{{ r.tenNCC }}</td>
+          <td class="text-end">{{ "{:,.0f}".format(r.giaBan) }} đ</td>
+          <td class="text-center">
+            <span class="badge {% if r.soLuongTon <= 10 %}bg-danger{% elif r.soLuongTon <= 30 %}bg-warning text-dark{% else %}bg-success{% endif %}">
+              {{ r.soLuongTon }}
+            </span>
+          </td>
+          <td>{{ r.donVi }}</td>
+          <td class="text-nowrap">
+            <button class="btn btn-sm btn-outline-primary"
+              data-bs-toggle="modal" data-bs-target="#modalSua{{ r.maSanPham }}">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <a href="{{ url_for('xoa_sp', id=r.maSanPham) }}"
+               class="btn btn-sm btn-outline-danger"
+               onclick="return confirm('Xóa sản phẩm này?')">
+              <i class="bi bi-trash"></i>
+            </a>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="text-center text-muted py-4">Không có dữ liệu</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal Thêm -->
+<div class="modal fade" id="modalThem" tabindex="-1">
+  <div class="modal-dialog">
+    <form method="post" action="{{ url_for('them_sp') }}" class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Thêm sản phẩm</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="mb-3"><label class="form-label">Tên sản phẩm *</label>
+          <input name="tenSanPham" class="form-control" required></div>
+        <div class="mb-3"><label class="form-label">Danh mục *</label>
+          <select name="maDanhMuc" class="form-select" required>
+            {% for dm in danhmucs %}<option value="{{ dm.maDanhMuc }}">{{ dm.tenDanhMuc }}</option>{% endfor %}
+          </select></div>
+        <div class="mb-3"><label class="form-label">Nhà cung cấp *</label>
+          <select name="maNCC" class="form-select" required>
+            {% for n in nccs %}<option value="{{ n.maNCC }}">{{ n.tenNCC }}</option>{% endfor %}
+          </select></div>
+        <div class="row">
+          <div class="col mb-3"><label class="form-label">Giá bán (đ) *</label>
+            <input name="giaBan" type="number" min="1" class="form-control" required></div>
+          <div class="col mb-3"><label class="form-label">Tồn kho *</label>
+            <input name="soLuongTon" type="number" min="0" class="form-control" required></div>
+        </div>
+        <div class="mb-3"><label class="form-label">Đơn vị</label>
+          <input name="donVi" class="form-control" value="cái"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="submit" class="btn btn-primary">Lưu</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Sửa -->
+{% for r in rows %}
+<div class="modal fade" id="modalSua{{ r.maSanPham }}" tabindex="-1">
+  <div class="modal-dialog">
+    <form method="post" action="{{ url_for('sua_sp', id=r.maSanPham) }}" class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Sửa sản phẩm #{{ r.maSanPham }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="mb-3"><label class="form-label">Tên sản phẩm *</label>
+          <input name="tenSanPham" class="form-control" value="{{ r.tenSanPham }}" required></div>
+        <div class="mb-3"><label class="form-label">Danh mục *</label>
+          <select name="maDanhMuc" class="form-select" required>
+            {% for dm in danhmucs %}
+            <option value="{{ dm.maDanhMuc }}" {% if dm.maDanhMuc==r.maDanhMuc %}selected{% endif %}>{{ dm.tenDanhMuc }}</option>
+            {% endfor %}
+          </select></div>
+        <div class="mb-3"><label class="form-label">Nhà cung cấp *</label>
+          <select name="maNCC" class="form-select" required>
+            {% for n in nccs %}
+            <option value="{{ n.maNCC }}" {% if n.maNCC==r.maNCC %}selected{% endif %}>{{ n.tenNCC }}</option>
+            {% endfor %}
+          </select></div>
+        <div class="row">
+          <div class="col mb-3"><label class="form-label">Giá bán (đ) *</label>
+            <input name="giaBan" type="number" min="1" class="form-control" value="{{ r.giaBan }}" required></div>
+          <div class="col mb-3"><label class="form-label">Tồn kho *</label>
+            <input name="soLuongTon" type="number" min="0" class="form-control" value="{{ r.soLuongTon }}" required></div>
+        </div>
+        <div class="mb-3"><label class="form-label">Đơn vị</label>
+          <input name="donVi" class="form-control" value="{{ r.donVi }}"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="submit" class="btn btn-primary">Cập nhật</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endfor %}
+{% endblock %}

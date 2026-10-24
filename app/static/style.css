@@ -1,0 +1,43 @@
+/* Custom styles */
+body { font-family: 'Segoe UI', sans-serif; }
+
+.sidebar { min-height: 100vh; background: #1a2f4e; width: 220px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+.sidebar .brand { color: #fff; font-size: 1.15rem; font-weight: 700; padding: 18px 16px 14px; border-bottom: 1px solid #2d4f7a; display: flex; align-items: center; gap: 8px; }
+.sidebar .nav-link { color: #8fafc8; border-radius: 8px; margin: 2px 8px; padding: 8px 12px; font-size: .92rem; display: flex; align-items: center; gap: 8px; }
+.sidebar .nav-link:hover { background: #2d4f7a; color: #fff; }
+.sidebar .nav-link.active { background: #2563eb; color: #fff; }
+.sidebar .nav-section { color: #4a6a8a; font-size: .72rem; font-weight: 600; letter-spacing: .08em; padding: 14px 18px 4px; text-transform: uppercase; }
+
+.main-content { flex: 1; min-width: 0; }
+
+.card { border: none; border-radius: 12px; box-shadow: 0 1px 6px rgba(0,0,0,.07); }
+.stat-card { border-left: 4px solid; transition: transform .15s; }
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,.12); }
+
+.table th { background: #f8fafc; font-weight: 600; font-size: .85rem; color: #475569; border-bottom: 2px solid #e2e8f0; }
+.table td { vertical-align: middle; font-size: .9rem; }
+.table-hover tbody tr:hover { background: #f1f5f9; }
+
+.badge { font-weight: 500; padding: .35em .65em; }
+.btn-sm { font-size: .8rem; }
+
+.search-bar .form-control { border-radius: 8px 0 0 8px; }
+.search-bar .btn { border-radius: 0 8px 8px 0; }
+
+.page-title { font-size: 1.3rem; font-weight: 700; color: #1e293b; }
+.section-divider { border: none; border-top: 1px solid #e2e8f0; margin: 1.5rem 0; }
+
+/* Tồn kho */
+.stock-low    { background: #fee2e2 !important; color: #dc2626 !important; }
+.stock-medium { background: #fef9c3 !important; color: #ca8a04 !important; }
+.stock-ok     { background: #dcfce7 !important; color: #16a34a !important; }
+
+/* Trạng thái hóa đơn */
+.status-hoan-thanh { background: #dcfce7; color: #16a34a; }
+.status-dang-giao  { background: #dbeafe; color: #1d4ed8; }
+.status-cho-xu-ly  { background: #fef9c3; color: #a16207; }
+.status-da-huy     { background: #fee2e2; color: #dc2626; }
+
+/* Chart bar */
+.bar-wrap { display: flex; align-items: center; gap: 8px; }
+.bar-fill { height: 18px; border-radius: 4px; background: #3b82f6; min-width: 4px; transition: width .4s; }

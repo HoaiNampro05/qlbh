@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Khách hàng{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="fw-bold mb-0"><i class="bi bi-people me-2"></i>Khách hàng</h4>
+  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalThem">
+    <i class="bi bi-plus-lg me-1"></i>Thêm mới
+  </button>
+</div>
+
+<!-- Tìm kiếm -->
+<form class="mb-3 d-flex gap-2" method="get">
+  <input name="q" class="form-control" placeholder="Tìm theo tên hoặc SĐT..." value="{{ kw }}">
+  <button class="btn btn-outline-secondary">Tìm</button>
+  {% if kw %}<a href="{{ url_for('khachhang') }}" class="btn btn-outline-danger">Xóa lọc</a>{% endif %}
+</form>
+
+<!-- Bảng -->
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr><th>ID</th><th>Họ tên</th><th>Số điện thoại</th><th>Email</th><th>Địa chỉ</th><th>Ngày đăng ký</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+        <tr>
+          <td>{{ r.maKH }}</td>
+          <td class="fw-semibold">{{ r.hoTen }}</td>
+          <td>{{ r.soDienThoai }}</td>
+          <td>{{ r.email or '—' }}</td>
+          <td>{{ r.diaChi or '—' }}</td>
+          <td>{{ r.ngayDangKy }}</td>
+          <td class="text-nowrap">
+            <button class="btn btn-sm btn-outline-primary"
+              data-bs-toggle="modal" data-bs-target="#modalSua{{ r.maKH }}">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <a href="{{ url_for('xoa_kh', id=r.maKH) }}"
+               class="btn btn-sm btn-outline-danger"
+               onclick="return confirm('Xóa khách hàng này?')">
+              <i class="bi bi-trash"></i>
+            </a>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-center text-muted py-4">Không có dữ liệu</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal Thêm -->
+<div class="modal fade" id="modalThem" tabindex="-1">
+  <div class="modal-dialog">
+    <form method="post" action="{{ url_for('them_kh') }}" class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Thêm khách hàng</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="mb-3"><label class="form-label">Họ tên *</label>
+          <input name="hoTen" class="form-control" required></div>
+        <div class="mb-3"><label class="form-label">Số điện thoại *</label>
+          <input name="soDienThoai" class="form-control" required></div>
+        <div class="mb-3"><label class="form-label">Email</label>
+          <input name="email" type="email" class="form-control"></div>
+        <div class="mb-3"><label class="form-label">Địa chỉ</label>
+          <input name="diaChi" class="form-control"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="submit" class="btn btn-primary">Lưu</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Sửa (mỗi dòng) -->
+{% for r in rows %}
+<div class="modal fade" id="modalSua{{ r.maKH }}" tabindex="-1">
+  <div class="modal-dialog">
+    <form method="post" action="{{ url_for('sua_kh', id=r.maKH) }}" class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Sửa khách hàng #{{ r.maKH }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="mb-3"><label class="form-label">Họ tên *</label>
+          <input name="hoTen" class="form-control" value="{{ r.hoTen }}" required></div>
+        <div class="mb-3"><label class="form-label">Số điện thoại *</label>
+          <input name="soDienThoai" class="form-control" value="{{ r.soDienThoai }}" required></div>
+        <div class="mb-3"><label class="form-label">Email</label>
+          <input name="email" type="email" class="form-control" value="{{ r.email or '' }}"></div>
+        <div class="mb-3"><label class="form-label">Địa chỉ</label>
+          <input name="diaChi" class="form-control" value="{{ r.diaChi or '' }}"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="submit" class="btn btn-primary">Cập nhật</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endfor %}
+{% endblock %}

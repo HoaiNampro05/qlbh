@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Dashboard – Quản lý Bán hàng{% endblock %}
+{% block content %}
+<h4 class="page-title mb-4">Dashboard</h4>
+
+<!-- Stat cards -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-xl-3">
+    <div class="card stat-card p-3" style="border-color:#2563eb">
+      <div class="text-muted small mb-1">Khách hàng</div>
+      <div class="fs-2 fw-bold" style="color:#2563eb">{{ so_kh }}</div>
+      <div class="text-muted small mt-1"><i class="bi bi-people me-1"></i>Tổng đã đăng ký</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="card stat-card p-3" style="border-color:#16a34a">
+      <div class="text-muted small mb-1">Sản phẩm</div>
+      <div class="fs-2 fw-bold" style="color:#16a34a">{{ so_sp }}</div>
+      <div class="text-muted small mt-1"><i class="bi bi-box-seam me-1"></i>Đang kinh doanh</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="card stat-card p-3" style="border-color:#d97706">
+      <div class="text-muted small mb-1">Hóa đơn</div>
+      <div class="fs-2 fw-bold" style="color:#d97706">{{ so_hd }}</div>
+      <div class="text-muted small mt-1"><i class="bi bi-receipt me-1"></i>Tổng hóa đơn</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="card stat-card p-3" style="border-color:#dc2626">
+      <div class="text-muted small mb-1">Doanh thu</div>
+      <div class="fs-5 fw-bold" style="color:#dc2626">{{ "{:,.0f}".format(doanh_thu) }} đ</div>
+      <div class="text-muted small mt-1"><i class="bi bi-graph-up me-1"></i>Hóa đơn hoàn thành</div>
+    </div>
+  </div>
+</div>
+
+<!-- Top sản phẩm -->
+<div class="card p-4">
+  <h6 class="fw-bold mb-3"><i class="bi bi-trophy me-2 text-warning"></i>Top 5 sản phẩm bán chạy</h6>
+  {% if top_sp %}
+    {% set max_val = top_sp[0].tong %}
+    {% for i, sp in enumerate(top_sp, 1) %}
+    <div class="d-flex align-items-center mb-2 gap-3">
+      <div style="width:24px;text-align:center;font-weight:600;color:#94a3b8">{{ i }}</div>
+      <div style="width:220px;font-size:.9rem">{{ sp.tenSanPham }}</div>
+      <div class="flex-grow-1 bg-light rounded" style="height:20px">
+        <div class="rounded" style="height:20px;width:{{ (sp.tong / max_val * 100)|int }}%;background:#2563eb"></div>
+      </div>
+      <div style="width:60px;text-align:right;font-weight:600;font-size:.9rem">{{ sp.tong }}</div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <p class="text-muted">Chưa có dữ liệu bán hàng.</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -34,6 +34,8 @@ mysql -u root -p < sql/04_objects.sql
 mysql -u root -p < sql/05_admin.sql
 ```
 
+hoặc chạy các file .sql này trong mysql workbench
+
 ### 2. Cài thư viện Python
 
 ```bash

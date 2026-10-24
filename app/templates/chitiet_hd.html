@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}Chi tiết hóa đơn #{{ hd.maHD }}{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center gap-2 mb-4">
+  <a href="{{ url_for('hoadon') }}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left"></i>
+  </a>
+  <h4 class="page-title mb-0">Hóa đơn #{{ hd.maHD }}</h4>
+</div>
+
+<div class="row g-3 mb-4">
+  <!-- Thông tin -->
+  <div class="col-md-6">
+    <div class="card p-3 h-100">
+      <h6 class="fw-bold mb-3">Thông tin hóa đơn</h6>
+      <table class="table table-sm mb-0">
+        <tr><td class="text-muted" style="width:120px">Khách hàng</td>
+            <td class="fw-semibold">{{ hd.tenKH }}</td></tr>
+        <tr><td class="text-muted">SĐT</td><td>{{ hd.soDienThoai }}</td></tr>
+        <tr><td class="text-muted">Nhân viên</td><td>{{ hd.tenNV }}</td></tr>
+        <tr><td class="text-muted">Ngày lập</td>
+            <td>{{ hd.ngayLap.strftime('%d/%m/%Y %H:%M') if hd.ngayLap else '—' }}</td></tr>
+        <tr><td class="text-muted">Ghi chú</td><td>{{ hd.ghiChu or '—' }}</td></tr>
+      </table>
+    </div>
+  </div>
+  <!-- Trạng thái -->
+  <div class="col-md-6">
+    <div class="card p-3 h-100">
+      <h6 class="fw-bold mb-3">Cập nhật trạng thái</h6>
+      {% set badge = {'Hoàn thành':'bg-success','Đang giao':'bg-primary','Chờ xử lý':'bg-warning text-dark','Đã hủy':'bg-danger'} %}
+      <span class="badge fs-6 {{ badge.get(hd.trangThai,'bg-secondary') }} mb-3">{{ hd.trangThai }}</span>
+      <form method="post" action="{{ url_for('capnhat_hd', id=hd.maHD) }}" class="d-flex gap-2">
+        <select name="trangThai" class="form-select form-select-sm">
+          {% for t in ['Chờ xử lý','Đang giao','Hoàn thành','Đã hủy'] %}
+          <option {% if t==hd.trangThai %}selected{% endif %}>{{ t }}</option>
+          {% endfor %}
+        </select>
+        <button class="btn btn-sm btn-primary">Lưu</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Thêm sản phẩm (chỉ hiện khi chưa hoàn thành/hủy) -->
+{% if hd.trangThai in ['Chờ xử lý', 'Đang giao'] %}
+<div class="card p-4 mb-4">
+  <h6 class="fw-bold mb-3"><i class="bi bi-plus-circle me-2 text-primary"></i>Thêm sản phẩm vào hóa đơn</h6>
+  <form method="post" action="{{ url_for('them_sp_vao_hd', id=hd.maHD) }}" class="row g-2 align-items-end">
+    <div class="col-md-4">
+      <label class="form-label small">Sản phẩm *</label>
+      <select name="maSanPham" class="form-select form-select-sm" required>
+        <option value="">-- Chọn sản phẩm --</option>
+        {% for sp in sanphams %}
+        <option value="{{ sp.maSanPham }}">{{ sp.tenSanPham }} (còn {{ sp.soLuongTon }} {{ sp.donVi }})</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small">Số lượng *</label>
+      <input name="soLuong" type="number" min="1" value="1" class="form-control form-control-sm" required>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small">Giảm giá (%)</label>
+      <input name="giamGia" type="number" min="0" max="100" step="0.1" value="0" class="form-control form-control-sm">
+    </div>
+    <div class="col-md-2">
+      <button type="submit" class="btn btn-primary btn-sm w-100">
+        <i class="bi bi-plus-lg me-1"></i>Thêm
+      </button>
+    </div>
+  </form>
+</div>
+{% endif %}
+
+<!-- Chi tiết sản phẩm -->
+<div class="card p-4">
+  <h6 class="fw-bold mb-3">Danh sách sản phẩm</h6>
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr><th>Sản phẩm</th><th class="text-center">SL</th>
+            <th class="text-end">Đơn giá</th><th class="text-center">Giảm</th>
+            <th class="text-end">Thành tiền</th>
+            {% if hd.trangThai in ['Chờ xử lý','Đang giao'] %}<th></th>{% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in ct %}
+        <tr>
+          <td>{{ r.tenSanPham }}</td>
+          <td class="text-center">{{ r.soLuong }}</td>
+          <td class="text-end">{{ "{:,.0f}".format(r.donGia) }} đ</td>
+          <td class="text-center">{{ r.giamGia }}%</td>
+          <td class="text-end fw-semibold">{{ "{:,.0f}".format(r.thanhTien) }} đ</td>
+          {% if hd.trangThai in ['Chờ xử lý','Đang giao'] %}
+          <td>
+            <a href="{{ url_for('xoa_sp_khoi_hd', id=hd.maHD, sp_id=r.maSanPham) }}"
+               class="btn btn-sm btn-outline-danger"
+               onclick="return confirm('Xóa sản phẩm này khỏi hóa đơn?')">
+              <i class="bi bi-trash"></i>
+            </a>
+          </td>
+          {% endif %}
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-muted py-3">Chưa có sản phẩm nào</td></tr>
+        {% endfor %}
+      </tbody>
+      {% if ct %}
+      <tfoot>
+        <tr class="table-active">
+          <td colspan="{% if hd.trangThai in ['Chờ xử lý','Đang giao'] %}4{% else %}4{% endif %}"
+              class="text-end fw-bold">Tổng cộng:</td>
+          <td class="text-end fw-bold text-primary fs-5">{{ "{:,.0f}".format(tong) }} đ</td>
+          {% if hd.trangThai in ['Chờ xử lý','Đang giao'] %}<td></td>{% endif %}
+        </tr>
+      </tfoot>
+      {% endif %}
+    </table>
+  </div>
+</div>
+{% endblock %}
